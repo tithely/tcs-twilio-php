@@ -13,8 +13,11 @@
 namespace Twilio\Rest;
 
 use Twilio\Domain;
+use Twilio\Exceptions\ConfigurationException;
 use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Api\V2010;
+
+use function PHPUnit\Framework\throwException;
 
 /**
  * @property \Twilio\Rest\Api\V2010 $v2010
@@ -26,11 +29,18 @@ class ApiBase extends Domain {
      * Construct the Api Domain
      *
      * @param Client $client Client to communicate with Twilio
+     * @throws ConfigurationException
      */
     public function __construct(Client $client) {
         parent::__construct($client);
 
-        $this->baseUrl = 'https://api.twilio.com';
+        $proxy_url = getenv('TWILIO_PROXY_BASE_URL');
+
+        if (!$proxy_url) {
+            throw new ConfigurationException('Twilio Proxy Configuration Error: Proxy URL must be defined!');
+        }
+
+        $this->baseUrl = $proxy_url;
     }
 
 
@@ -83,6 +93,6 @@ class ApiBase extends Domain {
      * @return string Machine friendly representation
      */
     public function __toString(): string {
-        return '[Twilio.Api]';
+        return '[Tithely.CS.Twilio.Api]';
     }
 }
